@@ -1,37 +1,32 @@
 name: Executar Notebook
+name: Executar Notebook com Papermill
 
 on:
   push:
     paths:
-      - 'associacao_por_proximidade.ipynb'
+      - '**.ipynb'
       - 'requirements.txt'
-      - '.github/workflows/run-notebook.yml'
   workflow_dispatch:
 
 jobs:
-  execute-notebook:
+  run-notebook:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repositório
+      - name: Clonar o repositório
         uses: actions/checkout@v3
 
-      - name: Instalar Python
+      - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
       - name: Instalar dependências
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install jupyter nbconvert nbformat ipykernel
+          pip install papermill
 
-      - name: Registrar kernel
+      - name: Executar notebook com Papermill
         run: |
-          python -m ipykernel install --user --name=python3
-
-      - name: Executar notebook
-        run: |
-          jupyter nbconvert --execute associacao_por_proximidade.ipynb --to notebook --inplace
-
+          papermill associacao_por_proximidade.ipynb associacao_por_proximidade_output.ipynb
