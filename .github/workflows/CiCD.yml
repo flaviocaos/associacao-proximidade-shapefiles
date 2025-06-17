@@ -1,0 +1,37 @@
+name: Executar Notebook
+
+on:
+  push:
+    paths:
+      - 'associacao_por_proximidade.ipynb'
+      - 'requirements.txt'
+      - '.github/workflows/run-notebook.yml'
+  workflow_dispatch:
+
+jobs:
+  execute-notebook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install jupyter nbconvert nbformat ipykernel
+
+      - name: Registrar kernel
+        run: |
+          python -m ipykernel install --user --name=python3
+
+      - name: Executar notebook
+        run: |
+          jupyter nbconvert --execute associacao_por_proximidade.ipynb --to notebook --inplace
+
